@@ -1,8 +1,9 @@
-package de.heaal.eaf.crossover;
+package test.de.heaal.eaf.crossover;
 
 import de.heaal.eaf.base.GenericIndividual;
 import de.heaal.eaf.base.Individual;
 import de.heaal.eaf.base.VecN;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -11,10 +12,22 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MeanCombinationTest {
+
+
+    @Test
+    void testCombineShallFailWithNullAsInput() {
+        MeanCombination meanCombination = new MeanCombination();
+        assertThrows(IllegalArgumentException.class,() ->meanCombination.combine(null));
+    }
+
+    @Test
+    void testCombineShallFailWithParentObjectAsNull() {
+        MeanCombination meanCombination = new MeanCombination();
+        assertThrows(IllegalArgumentException.class,() ->meanCombination.combine(new Individual[]{null,null}));
+    }
 
     @ParameterizedTest
     @ArgumentsSource(CombineTestArguments.class)
