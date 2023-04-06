@@ -24,12 +24,14 @@
 
 package de.heaal.eaf.testbench;
 
+import de.heaal.eaf.algorithm.GeneticAlgorithm;
 import de.heaal.eaf.algorithm.HillClimbingAlgorithm;
 import de.heaal.eaf.evaluation.ComparatorIndividual;
 import de.heaal.eaf.base.Individual;
 import de.heaal.eaf.evaluation.MinimizeFunctionComparator;
 import de.heaal.eaf.mutation.RandomMutation;
 
+import java.util.Random;
 import java.util.function.Function;
 
 import static java.lang.Math.*;
@@ -58,10 +60,9 @@ public class TestHillClimbing {
                     return (float) (-20 * exp(-0.2 * sqrt(0.5 * (pow(x0, 2) + pow(x1, 2)))) -
                             exp(0.5 * (cos(2 * PI * x0) + cos(2 * PI * x1))) + exp(1) + 20);
                 };
-        var comparator = new MinimizeFunctionComparator(evalAckley);
+        var comparator = new MinimizeFunctionComparator(evalSphereFunc2D);
 
-        var algo = new HillClimbingAlgorithm(min, max,
-                comparator, new RandomMutation(min, max), new ComparatorIndividual(0.001f));
+        var algo = new GeneticAlgorithm( comparator, new RandomMutation(min, max),min, max,evalSphereFunc2D, new ComparatorIndividual(0.0001f));
         algo.run();
     }
 }

@@ -3,6 +3,7 @@ package test.de.heaal.eaf.crossover;
 import de.heaal.eaf.base.GenericIndividual;
 import de.heaal.eaf.base.Individual;
 import de.heaal.eaf.base.VecN;
+import de.heaal.eaf.crossover.MeanCombination;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
