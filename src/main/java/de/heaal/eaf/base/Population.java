@@ -65,7 +65,11 @@ public class Population<T extends Individual> implements Iterable<T> {
     public Population(int initialCapacity) {
         individuals = new ArrayList<>(initialCapacity);
     }
-    
+
+    public Population(List<T> population) {
+        this.individuals = population;
+    }
+
     public void add(T ind) {
         individuals.add(ind);
     }
@@ -73,7 +77,10 @@ public class Population<T extends Individual> implements Iterable<T> {
     public T get(int idx) {
         return individuals.get(idx);
     }
-    
+
+    public void set(List<T> newPopulation) {
+        this.individuals = newPopulation;
+    }
     public <T> T get(int idx, Class<T> clazz) {
         return (T)get(idx);
     }
