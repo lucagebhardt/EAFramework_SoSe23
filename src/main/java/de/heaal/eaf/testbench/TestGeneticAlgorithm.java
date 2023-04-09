@@ -2,17 +2,17 @@
  * Evolutionary Algorithms Framework
  *
  * Copyright (c) 2023 Christian Lins <christian.lins@haw-hamburg.de>
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
 
 package de.heaal.eaf.testbench;
 
-import de.heaal.eaf.algorithm.HillClimbingAlgorithm;
+import de.heaal.eaf.algorithm.GeneticAlgorithm;
 import de.heaal.eaf.evaluation.ComparatorIndividual;
 import de.heaal.eaf.base.Individual;
 import de.heaal.eaf.evaluation.MinimizeFunctionComparator;
@@ -35,17 +35,17 @@ import static java.lang.Math.*;
 
 /**
  * Test bench for the Hill Climbing algorithm.
- * 
+ *
  * @author Christian Lins <christian.lins@haw-hamburg.de>
  */
-public class TestHillClimbing {
+public class TestGeneticAlgorithm {
     public static void main(String[] args) {
         float[] min = {-5.12f, -5.12f};
         float[] max = {+5.12f, +5.12f};
-        
+
         // Sphere Function n=2
-        Function<Individual,Float> evalSphereFunc2D = 
-                (ind) -> { 
+        Function<Individual,Float> evalSphereFunc2D =
+                (ind) -> {
                     var x0 = ind.getGenome().array()[0];
                     var x1 = ind.getGenome().array()[1];
                     return x0*x0 + x1*x1;
@@ -59,8 +59,8 @@ public class TestHillClimbing {
                 };
 
         var comparator = new MinimizeFunctionComparator(evalSphereFunc2D);
-        var algo = new HillClimbingAlgorithm(min, max,
-                comparator, new RandomMutation(min, max), new ComparatorIndividual(0.001f));
+        var algo = new GeneticAlgorithm(min, max,
+                comparator, new RandomMutation(min, max), new ComparatorIndividual(0.001f), 10, evalSphereFunc2D, false, 1);
         algo.run();
     }
 }

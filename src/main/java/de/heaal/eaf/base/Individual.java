@@ -24,6 +24,8 @@
 
 package de.heaal.eaf.base;
 
+import java.util.function.Function;
+
 /**
  * Interface for a very basic Individual of EA.
  * 

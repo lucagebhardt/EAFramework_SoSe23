@@ -2,17 +2,17 @@
  * Evolutionary Algorithms Framework
  *
  * Copyright (c) 2023 Christian Lins <christian.lins@haw-hamburg.de>
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,18 +32,18 @@ import java.util.Random;
 
 /**
  * Combines two Individuals at a single point.Example:
-      AAAAAAA
-      BBBBBBB
- 
-      --> AABBBBB
- * 
+ AAAAAAA
+ BBBBBBB
+
+ --> AABBBBB
+ *
  * @author Christian Lins <christian.lins@haw-hamburg.de>
  * @param <T>
  */
-public class SinglePointCrossover<T extends Individual> implements Combination<T> {
+public class MeanCrossover<T extends Individual> implements Combination<T> {
 
     protected Random rng;
-    
+
     @Override
     public void setRandom(Random rng) {
         this.rng = rng;
@@ -53,40 +53,14 @@ public class SinglePointCrossover<T extends Individual> implements Combination<T
     public T combine(Individual[] parents) {
         int dim = parents[0].getGenome().len();
         T child = (T)parents[0].copy();
-        
-        int crossPoint = rng.nextInt(dim);
-        System.arraycopy(
-                parents[1].getGenome().array(), 
-                crossPoint, 
-                parents[0].getGenome().array(), 
-                crossPoint, 
-                dim - crossPoint);
-        
+        for (int gene_idx = 0; gene_idx < dim; gene_idx++){
+            float gene_summed_up = 0;
+            for (Individual parent: parents){
+                gene_summed_up += parent.getGenome().array()[gene_idx];
+            }
+            // Set the child's gene equal to the mean value of the parents' genes
+            child.getGenome().array()[gene_idx] = gene_summed_up / parents.length;
+        }
         return child;
     }
-
-    public List<T> produce_two_children(Individual parent_1, Individual parent_2) {
-        int dim = parent_1.getGenome().len();
-        T child_1 = (T)parent_1.copy();
-        T child_2 =(T)parent_2.copy();
-
-        int crossPoint = rng.nextInt(dim);
-        System.arraycopy(
-                parent_2.getGenome().array(),
-                crossPoint,
-                child_1.getGenome().array(),
-                crossPoint,
-                dim - crossPoint);
-        System.arraycopy(
-                parent_1.getGenome().array(),
-                crossPoint,
-                child_2.getGenome().array(),
-                crossPoint,
-                dim - crossPoint);
-        List<T> children = new ArrayList<>();
-        children.add(child_1);
-        children.add(child_2);
-        return children;
-    }
-    
 }
