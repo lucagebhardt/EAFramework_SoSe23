@@ -24,19 +24,14 @@
 
 package de.heaal.eaf.algorithm;
 
-import de.heaal.eaf.base.GenericIndividualFactory;
-import de.heaal.eaf.base.Algorithm;
+import de.heaal.eaf.base.*;
 import de.heaal.eaf.evaluation.ComparatorIndividual;
-import de.heaal.eaf.base.Individual;
-import de.heaal.eaf.base.IndividualFactory;
 import de.heaal.eaf.mutation.Mutation;
 import de.heaal.eaf.mutation.MutationOptions;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.function.Function;
 
 /**
  * Implementation of the Hill Climbing algorithm.
@@ -50,23 +45,25 @@ public class HillClimbingAlgorithm extends Algorithm<Individual> {
 
     private final MutationOptions mutationOptions;
     private final int singleIndividualIndex;
-    private final String csvFileName;
+    private final GenerationsCsvWriter csvWriter;
+    private final float mutationProbability;
+    private final Function<Individual, Float> fitnessFunction;
 
     public HillClimbingAlgorithm(float[] min, float[] max,
                                  Comparator<Individual> comparator, Mutation mutator,
-                                 ComparatorIndividual terminationCriterion) {
+                                 ComparatorIndividual terminationCriterion,
+                                 float mutationProbability, GenerationsCsvWriter csvWriter, Function<Individual, Float> fitnessFunction) {
         super(comparator, mutator);
         this.indFac = new GenericIndividualFactory(min, max);
         this.terminationCriterion = terminationCriterion;
         mutationOptions = new MutationOptions();
-        mutationOptions.put(MutationOptions.KEYS.MUTATION_PROBABILITY, 0.5f);
+        this.mutationProbability= mutationProbability;
+        mutationOptions.put(MutationOptions.KEYS.MUTATION_PROBABILITY, mutationProbability);
         singleIndividualIndex = 0;
-        csvFileName = "updatedAlgorithmValues.csv";
-        File file = new File(csvFileName);
-        if(file.exists()){
-            file.delete();
-        }
+        this.csvWriter = csvWriter;
+        this.fitnessFunction = fitnessFunction;
     }
+
 
     private boolean mutatedIndividualIsBetter(int compareResult) {
         return compareResult > 0;
@@ -74,6 +71,7 @@ public class HillClimbingAlgorithm extends Algorithm<Individual> {
 
     @Override
     public void nextGeneration() {
+
         super.nextGeneration();
         Individual chosenIndividual = population.get(singleIndividualIndex);
         Individual copyOfChosenIndividual = chosenIndividual.copy();
@@ -81,20 +79,9 @@ public class HillClimbingAlgorithm extends Algorithm<Individual> {
         int compareResult = comparator.compare(copyOfChosenIndividual, chosenIndividual);
         if (mutatedIndividualIsBetter(compareResult)) {
             population.set(singleIndividualIndex, copyOfChosenIndividual);
-            writeUpdatedValuesToCsv();
         }
     }
 
-    private void writeUpdatedValuesToCsv() {
-        try {
-            FileWriter fw = new FileWriter(csvFileName,true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(population.get(singleIndividualIndex).getGenome().array()[0] + "," + population.get(singleIndividualIndex).getGenome().array()[1] + "\n");
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public boolean isTerminationCondition() {
@@ -105,9 +92,21 @@ public class HillClimbingAlgorithm extends Algorithm<Individual> {
 
     @Override
     public void run() {
+        int generationCounter = 0;
         initialize(indFac, 1);
-        while (!isTerminationCondition()) {
+        while (!isTerminationCondition()&& generationCounter<10000) {
+            try {
+                csvWriter.writeGeneration(generationCounter,fitnessFunction.apply(population.get(0)),this.mutationProbability);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             nextGeneration();
+            generationCounter++;
+        }
+        try {
+            csvWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

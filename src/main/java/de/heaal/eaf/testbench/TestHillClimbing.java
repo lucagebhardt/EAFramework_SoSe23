@@ -43,6 +43,7 @@ import static java.lang.Math.*;
  */
 public class TestHillClimbing {
     public static void main(String[] args) {
+
         float[] min = {-5.12f, -5.12f};
         float[] max = {+5.12f, +5.12f};
 
@@ -62,7 +63,8 @@ public class TestHillClimbing {
                 };
         var comparator = new MinimizeFunctionComparator(evalSphereFunc2D);
 
-        var algo = new GeneticAlgorithm( comparator, new RandomMutation(min, max),min, max,evalSphereFunc2D, new ComparatorIndividual(0.0001f));
-        algo.run();
+//        var algo = new GeneticAlgorithm( comparator, new RandomMutation(min, max),min, max,evalSphereFunc2D, new ComparatorIndividual(0.0001f));
+//        algo.setElitism(1);
+//        algo.run();
     }
 }
