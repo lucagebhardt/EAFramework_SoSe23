@@ -31,6 +31,7 @@ import de.heaal.eaf.base.Individual;
 import de.heaal.eaf.base.IndividualFactory;
 import de.heaal.eaf.mutation.Mutation;
 import de.heaal.eaf.mutation.MutationOptions;
+import de.heaal.eaf.testbench.DataCollector;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -50,22 +51,19 @@ public class HillClimbingAlgorithm extends Algorithm<Individual> {
 
     private final MutationOptions mutationOptions;
     private final int singleIndividualIndex;
-    private final String csvFileName;
+    private final DataCollector dataCollector;
+
 
     public HillClimbingAlgorithm(float[] min, float[] max,
                                  Comparator<Individual> comparator, Mutation mutator,
-                                 ComparatorIndividual terminationCriterion) {
+                                 ComparatorIndividual terminationCriterion, float mutation_prob,DataCollector dataCollector) {
         super(comparator, mutator);
+        this.dataCollector = dataCollector;
         this.indFac = new GenericIndividualFactory(min, max);
         this.terminationCriterion = terminationCriterion;
         mutationOptions = new MutationOptions();
-        mutationOptions.put(MutationOptions.KEYS.MUTATION_PROBABILITY, 0.5f);
+        mutationOptions.put(MutationOptions.KEYS.MUTATION_PROBABILITY, mutation_prob);
         singleIndividualIndex = 0;
-        csvFileName = "updatedAlgorithmValues.csv";
-        File file = new File(csvFileName);
-        if(file.exists()){
-            file.delete();
-        }
     }
 
     private boolean mutatedIndividualIsBetter(int compareResult) {
@@ -81,18 +79,6 @@ public class HillClimbingAlgorithm extends Algorithm<Individual> {
         int compareResult = comparator.compare(copyOfChosenIndividual, chosenIndividual);
         if (mutatedIndividualIsBetter(compareResult)) {
             population.set(singleIndividualIndex, copyOfChosenIndividual);
-            writeUpdatedValuesToCsv();
-        }
-    }
-
-    private void writeUpdatedValuesToCsv() {
-        try {
-            FileWriter fw = new FileWriter(csvFileName,true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(population.get(singleIndividualIndex).getGenome().array()[0] + "," + population.get(singleIndividualIndex).getGenome().array()[1] + "\n");
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -107,8 +93,11 @@ public class HillClimbingAlgorithm extends Algorithm<Individual> {
     public void run() {
         initialize(indFac, 1);
         while (!isTerminationCondition()) {
+            dataCollector.saveFitnessOfIndividual(population.get(0).getCache());
+            dataCollector.prepareForNextGeneration();
             nextGeneration();
         }
+        dataCollector.saveFitnessOfIndividual(population.get(0).getCache());
     }
 
 }

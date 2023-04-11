@@ -58,9 +58,11 @@ public class TestHillClimbing {
                             exp(0.5 * (cos(2 * PI * x0) + cos(2 * PI * x1))) + exp(1) + 20);
                 };
 
-        var comparator = new MinimizeFunctionComparator(evalSphereFunc2D);
+        var comparator = new MinimizeFunctionComparator(evalAckley);
         var algo = new HillClimbingAlgorithm(min, max,
-                comparator, new RandomMutation(min, max), new ComparatorIndividual(0.001f));
+                comparator, new RandomMutation(min, max), new ComparatorIndividual(0.001f), 0.3f,
+                new CsvCreator("03-A-HCA.csv", 1000) {
+        });
         algo.run();
     }
 }
