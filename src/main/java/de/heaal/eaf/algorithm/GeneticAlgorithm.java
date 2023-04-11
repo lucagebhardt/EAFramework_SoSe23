@@ -34,11 +34,8 @@ import de.heaal.eaf.base.IndividualFactory;
 import de.heaal.eaf.mutation.Mutation;
 import de.heaal.eaf.mutation.MutationOptions;
 import de.heaal.eaf.selection.SelectionUtils;
+import de.heaal.eaf.testbench.DataCollector;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -56,18 +53,18 @@ public class GeneticAlgorithm extends Algorithm<Individual> {
     private final ComparatorIndividual terminationCriterion;
 
     private final MutationOptions mutationOptions;
-    //private final int singleIndividualIndex;
-    private final String csvFileName;
-
     private final int population_size;
     private final Function<Individual,Float> fitness_function;
     private final boolean use_mean_crossover;
     private final int elite_size;
 
+    private final DataCollector dataCollector;
+
     public GeneticAlgorithm(float[] min, float[] max,
-                                 Comparator<Individual> comparator, Mutation mutator,
-                                 ComparatorIndividual terminationCriterion, int population_size,
-                                Function<Individual,Float> fitness_function, boolean use_mean_crossover, int elite_size) {
+                            Comparator<Individual> comparator, Mutation mutator,
+                            ComparatorIndividual terminationCriterion, int population_size, float mutation_prob,
+                            Function<Individual,Float> fitness_function, boolean use_mean_crossover, int elite_size,
+                            DataCollector dataCollector) {
         super(comparator, mutator);
         this.indFac = new GenericIndividualFactory(min, max);
         this.terminationCriterion = terminationCriterion;
@@ -75,13 +72,9 @@ public class GeneticAlgorithm extends Algorithm<Individual> {
         this.fitness_function = fitness_function;
         this.use_mean_crossover = use_mean_crossover;
         this.elite_size = elite_size;
+        this.dataCollector = dataCollector;
         mutationOptions = new MutationOptions();
-        mutationOptions.put(MutationOptions.KEYS.MUTATION_PROBABILITY, 0.3f);
-        csvFileName = "updatedAlgorithmValues.csv";
-        File file = new File(csvFileName);
-        if(file.exists()){
-            file.delete();
-        }
+        mutationOptions.put(MutationOptions.KEYS.MUTATION_PROBABILITY, mutation_prob);
     }
 
     @Override
@@ -97,6 +90,7 @@ public class GeneticAlgorithm extends Algorithm<Individual> {
         for(int idx = 0; idx < population.size(); idx++){
             Individual current_individual = population.get(idx);
             current_individual.setCache(fitness_function.apply(current_individual));
+            dataCollector.saveFitnessOfIndividual(current_individual.getCache());
         }
         // Sort parents by their fitness
         population.sort(comparator);
@@ -118,24 +112,25 @@ public class GeneticAlgorithm extends Algorithm<Individual> {
             mutator.mutate(children.get(idx), mutationOptions);
             population.set(idx+elite_size, children.get(idx));
         }
-        //writeUpdatedValuesToCsv();
+        dataCollector.prepareForNextGeneration();
+        // Sort children by their fitness
+        population.sort(comparator);
+        // Calculate fitness for all children
+        for(int idx = 0; idx < population.size(); idx++){
+            Individual current_individual = population.get(idx);
+            current_individual.setCache(fitness_function.apply(current_individual));
+            dataCollector.saveFitnessOfIndividual(current_individual.getCache());
+        }
+        dataCollector.prepareForNextGeneration();
     }
 
-//    private void writeUpdatedValuesToCsv() {
-//        try {
-//            FileWriter fw = new FileWriter(csvFileName,true);
-//            BufferedWriter bw = new BufferedWriter(fw);
-//            bw.write(population.get(singleIndividualIndex).getGenome().array()[0] + "," + population.get(singleIndividualIndex).getGenome().array()[1] + "\n");
-//            bw.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+
 
     @Override
     public boolean isTerminationCondition() {
         // Sort the population by fitness so that the best individual is at position 0
         population.sort(comparator);
+        //System.out.println(population.get(0).getCache());
         return comparator.compare(population.get(0), terminationCriterion) > 0;
     }
 

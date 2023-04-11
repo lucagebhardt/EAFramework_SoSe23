@@ -60,7 +60,8 @@ public class TestGeneticAlgorithm {
 
         var comparator = new MinimizeFunctionComparator(evalSphereFunc2D);
         var algo = new GeneticAlgorithm(min, max,
-                comparator, new RandomMutation(min, max), new ComparatorIndividual(0.001f), 10, evalSphereFunc2D, false, 1);
+                comparator, new RandomMutation(min, max), new ComparatorIndividual(0.001f), 100, 0.3f,
+                evalAckley, true,1, new CsvCreator("100-1-03-M-A-GA.csv", 1000));
         algo.run();
     }
 }
