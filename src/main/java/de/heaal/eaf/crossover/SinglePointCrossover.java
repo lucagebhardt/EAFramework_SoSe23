@@ -54,11 +54,12 @@ public class SinglePointCrossover<T extends Individual> implements Combination<T
         
         int crossPoint = rng.nextInt(dim);
         System.arraycopy(
-                parents[1].getGenome().array(), 
-                crossPoint, 
-                parents[0].getGenome().array(), 
-                crossPoint, 
+                parents[1].getGenome().array(),
+                crossPoint,
+                parents[0].getGenome().array(),
+                crossPoint,
                 dim - crossPoint);
+
         
         return child;
     }

@@ -2,6 +2,7 @@ package de.heaal.eaf.algorithm;
 
 import de.heaal.eaf.base.*;
 import de.heaal.eaf.crossover.MeanCombination;
+import de.heaal.eaf.crossover.SinglePointCrossover;
 import de.heaal.eaf.evaluation.ComparatorIndividual;
 import de.heaal.eaf.mutation.Mutation;
 import de.heaal.eaf.mutation.MutationOptions;
@@ -21,6 +22,7 @@ public class GeneticAlgorithm extends Algorithm<Individual> {
     private final MutationOptions mutationOptions;
 
     private int elitism;
+    private final SinglePointCrossover<Individual> combination;
 
     public void setElitism(int elitism) {
         this.elitism = elitism;
@@ -37,7 +39,8 @@ public class GeneticAlgorithm extends Algorithm<Individual> {
         this.mutationProbability = mutationProbability;
         mutationOptions = new MutationOptions();
         mutationOptions.put(MutationOptions.KEYS.MUTATION_PROBABILITY, mutationProbability);
-
+        combination = new SinglePointCrossover<>();
+        combination.setRandom(new Random(1));
     }
 
     @Override
@@ -50,7 +53,7 @@ public class GeneticAlgorithm extends Algorithm<Individual> {
             Individual secondParent = SelectionUtils.selectNormal(population, new Random(), firstParent);
             int numberOfParents = 2;
             for (int i = 0; i < numberOfParents && children.size() != population.size(); i++) {
-                Individual newChildren = new MeanCombination().combine(new Individual[]{firstParent, secondParent});
+                Individual newChildren = combination.combine(new Individual[]{firstParent, secondParent});
                 children.add(newChildren);
             }
         }

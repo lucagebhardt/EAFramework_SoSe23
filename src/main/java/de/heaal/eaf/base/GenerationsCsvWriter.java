@@ -3,7 +3,6 @@ package de.heaal.eaf.base;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -11,8 +10,6 @@ import java.util.stream.IntStream;
 public class GenerationsCsvWriter extends FileWriter {
     public GenerationsCsvWriter(String fileName, boolean append, int populationSize) throws IOException {
         super(fileName, append);
-        File file = new File(fileName);
-        file.getParentFile().mkdirs();
         String resultString = IntStream.rangeClosed(0, populationSize)
                 .mapToObj(i -> String.format("%s%d,", "Individual ", i))
                 .collect(Collectors.joining());
@@ -21,11 +18,13 @@ public class GenerationsCsvWriter extends FileWriter {
 
     public GenerationsCsvWriter(String fileName, boolean append) throws IOException {
         super(fileName, append);
-        File file = new File(fileName);
-        file.getParentFile().mkdirs();
         write("Generation, Individual, Elitism, MutationProbability\n");
     }
 
+    public static void createParentDirectories(String fileName) {
+        File file = new File(fileName);
+        file.getParentFile().mkdirs();
+    }
     public void clearFile() throws IOException {
         write("");
     }

@@ -18,9 +18,11 @@ public class RunGenericAndHillClimbingTests {
         List<GenericAndHillClimbingTestConfiguration.RunConfiguration> configurationList = GenericAndHillClimbingTestConfiguration.getConfigurationList();
         for (RunConfiguration runConfiguration : configurationList) {
             var comparator = new MinimizeFunctionComparator(runConfiguration.fitnessFunction);
+            GenerationsCsvWriter.createParentDirectories(String.format("python/TestRuns/hill/%s-%s-%f.csv", "hill", runConfiguration.fitnessFunctionName, runConfiguration.mutationsProbability));
             GenerationsCsvWriter hillCsvWriter = new GenerationsCsvWriter(String.format("python/TestRuns/hill/%s-%s-%f.csv", "hill", runConfiguration.fitnessFunctionName, runConfiguration.mutationsProbability), false);
             HillClimbingAlgorithm hillClimbingAlgorithm = new HillClimbingAlgorithm(min, max, comparator, new RandomMutation(min, max), new ComparatorIndividual(0.0001f), runConfiguration.mutationsProbability, hillCsvWriter, runConfiguration.fitnessFunction);
             hillClimbingAlgorithm.run();
+            GenerationsCsvWriter.createParentDirectories(String.format("python/TestRuns/genetic/%s-%s-%f-%d.csv", "genetic", runConfiguration.fitnessFunctionName, runConfiguration.mutationsProbability, runConfiguration.elitism));
             GenerationsCsvWriter geneticCsvWriter = new GenerationsCsvWriter(String.format("python/TestRuns/genetic/%s-%s-%f-%d.csv", "genetic", runConfiguration.fitnessFunctionName, runConfiguration.mutationsProbability, runConfiguration.elitism), false, 100);
             GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(comparator, new RandomMutation(min, max), min, max, runConfiguration.fitnessFunction, new ComparatorIndividual(0.0001f), runConfiguration.mutationsProbability, geneticCsvWriter);
             geneticAlgorithm.setElitism(runConfiguration.elitism);
@@ -30,6 +32,7 @@ public class RunGenericAndHillClimbingTests {
         for (RunConfiguration runConfiguration : configurationListDifferentEpitilism) {
             for (int testRun = 0; testRun <20; testRun++) {
                 var comparator = new MinimizeFunctionComparator(runConfiguration.fitnessFunction);
+                GenerationsCsvWriter.createParentDirectories(String.format("python/TestRuns/genetic/many_elitism/%s-%s-%d-%d.csv", "genetic", runConfiguration.fitnessFunctionName, runConfiguration.elitism,testRun));
                 GenerationsCsvWriter geneticCsvWriter = new GenerationsCsvWriter(String.format("python/TestRuns/genetic/many_elitism/%s-%s-%d-%d.csv", "genetic", runConfiguration.fitnessFunctionName, runConfiguration.elitism,testRun), false, 100);
                 GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(comparator, new RandomMutation(min, max), min, max, runConfiguration.fitnessFunction, new ComparatorIndividual(0.0001f), runConfiguration.mutationsProbability, geneticCsvWriter);
                 geneticAlgorithm.setElitism(runConfiguration.elitism);
