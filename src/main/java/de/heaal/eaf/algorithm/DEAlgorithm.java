@@ -15,6 +15,8 @@ public class DEAlgorithm extends Algorithm<Individual>{
     private final IndividualFactory<Individual> indFac;
     private final ComparatorIndividual terminationCriterion;
 
+    private final int dimensions;
+
     public DEAlgorithm(float[] min, float[] max, Comparator<Individual> comparator, ComparatorIndividual terminationCriterion, Mutation mutator, Random rng, final float F, final float c, final int N) {
         super(comparator, mutator, rng);
         this.terminationCriterion = terminationCriterion;
@@ -22,6 +24,7 @@ public class DEAlgorithm extends Algorithm<Individual>{
         this.F = F;
         this.c = c;
         this.N = N;
+        this.dimensions = min.length;
     }
 
     @Override
@@ -34,6 +37,9 @@ public class DEAlgorithm extends Algorithm<Individual>{
     protected void nextGeneration() {
         super.nextGeneration();
         VecN[] u = new VecN[population.size()];
+        for (int idx = 0; idx < population.size(); idx++){
+            u[idx] = new VecN(this.dimensions);
+        }
         for (int i = 0; i < population.size(); i++) {
             int r1 = getRandomIntegerWithNumbersToAvoid(new int[]{i}, 0,N);
             int r2 = getRandomIntegerWithNumbersToAvoid(new int[]{i, r1}, 0, N);
@@ -51,7 +57,7 @@ public class DEAlgorithm extends Algorithm<Individual>{
             }
         }
         for (int i = 0; i < population.size(); i++) {
-            if (comparator.compare(new GenericIndividual(u[i]), population.get(i)) == 0) {
+            if (comparator.compare(new GenericIndividual(u[i]), population.get(i)) < 0) {
                 population.set(i, new GenericIndividual(u[i]));
             }
         }
@@ -68,10 +74,11 @@ public class DEAlgorithm extends Algorithm<Individual>{
     }
 
     @Override
-    protected void run() {
-        initialize(indFac, 1);
+    public void run() {
+        initialize(indFac, N);
         while (!isTerminationCondition()) {
             nextGeneration();
         }
+        System.out.println(population.get(0).getGenome().toString());
     }
 }

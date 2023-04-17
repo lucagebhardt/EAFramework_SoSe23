@@ -39,7 +39,7 @@ public class SensorMeasurementLeastSquareComparator<T extends Individual> implem
      */
     @Override
     public int compare(T o1, T o2) {
-
+        return 1;
     }
 
     @Override
