@@ -64,7 +64,7 @@ public class TestDEAlgo {
         var comparator = new MinimizeFunctionComparator(evalSphereFunc2D);
 
         var algo = new DEAlgorithm(min, max,
-                comparator, new ComparatorIndividual(0.001f), new RandomMutation(min, max),new Random(),0.4f, 0.1f, 10);
+                comparator, new ComparatorIndividual(0.001f), new RandomMutation(min, max),new Random(),0.4f, 0.1f, 10, new CsvCreator("DE_with_sphere", 10000));
         algo.run();
     }
 }

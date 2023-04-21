@@ -3,6 +3,7 @@ package de.heaal.eaf.algorithm;
 import de.heaal.eaf.base.*;
 import de.heaal.eaf.evaluation.ComparatorIndividual;
 import de.heaal.eaf.mutation.Mutation;
+import de.heaal.eaf.testbench.DataCollector;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -14,10 +15,11 @@ public class DEAlgorithm extends Algorithm<Individual>{
     private final int N;
     private final IndividualFactory<Individual> indFac;
     private final ComparatorIndividual terminationCriterion;
+    private final DataCollector dataCollector;
 
     private final int dimensions;
 
-    public DEAlgorithm(float[] min, float[] max, Comparator<Individual> comparator, ComparatorIndividual terminationCriterion, Mutation mutator, Random rng, final float F, final float c, final int N) {
+    public DEAlgorithm(float[] min, float[] max, Comparator<Individual> comparator, ComparatorIndividual terminationCriterion, Mutation mutator, Random rng, final float F, final float c, final int N, DataCollector dataCollector) {
         super(comparator, mutator, rng);
         this.terminationCriterion = terminationCriterion;
         this.indFac = new GenericIndividualFactory(min, max);
@@ -25,11 +27,15 @@ public class DEAlgorithm extends Algorithm<Individual>{
         this.c = c;
         this.N = N;
         this.dimensions = min.length;
+        this.dataCollector = dataCollector;
     }
 
     @Override
     protected boolean isTerminationCondition() {
         population.sort(comparator);
+        for (int i = 0; i < population.size(); i++) {
+            dataCollector.saveFitnessOfIndividual(population.get(i).getCache());
+        }
         return comparator.compare(population.get(0), terminationCriterion) > 0;
     }
 
@@ -77,6 +83,7 @@ public class DEAlgorithm extends Algorithm<Individual>{
     public void run() {
         initialize(indFac, N);
         while (!isTerminationCondition()) {
+            dataCollector.prepareForNextGeneration();
             nextGeneration();
         }
         System.out.println(population.get(0).getGenome().toString());
