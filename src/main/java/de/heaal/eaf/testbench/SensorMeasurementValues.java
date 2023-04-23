@@ -26,7 +26,7 @@ public class SensorMeasurementValues {
             float D = individual.getGenome().array()[3];
             return (float) (A*Math.sin(2*Math.PI*f*t+phi)+D);
         };
-        var comparator = new SensorMeasurementLeastSquareComparator("resources/sensordata.csv", fitnessFunction);
+        var comparator = new SensorMeasurementLeastSquareComparator("resources/generic_sinus.csv", fitnessFunction);
         var algo = new DEAlgorithm(min, max,
                 comparator, 10.f, new RandomMutation(min, max),new Random(),0.4f, 0.1f, 10, new CsvCreator("DE_with_csv", 10000));
         algo.run();

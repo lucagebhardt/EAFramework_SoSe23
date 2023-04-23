@@ -15,7 +15,7 @@ public class SensorMeasurementLeastSquareComparator<T extends Individual> implem
     private final List<List<String>> csvEntries;
     private final BiFunction<Individual, Float, Float> fitnessFunction;
 
-    private final static int CSV_COLUMN_OF_SENSOR_VALUES = 4;
+    private final static int CSV_COLUMN_OF_SENSOR_VALUES = 0;
 
     private int getNthRowFromCsvFile(int entry, int position) throws IOException {
         return Integer.parseInt(csvEntries.get(entry).get(position).split(";")[0]);
@@ -45,7 +45,7 @@ public class SensorMeasurementLeastSquareComparator<T extends Individual> implem
     public int compare(T o1, T o2) {
         float individualOneSumOfFailure = 0;
         float individualTwoSumOfFailure = 0;
-        for (int i = 1; i < 1000; i++) {
+        for (int i = 1; i < 500; i++) {
             try{
                 float currentCsvEntry = Float.parseFloat(csvEntries.get(i).get(CSV_COLUMN_OF_SENSOR_VALUES));
                 individualOneSumOfFailure += Math.pow(currentCsvEntry - fitnessFunction.apply(o1, (float) i), 2);
