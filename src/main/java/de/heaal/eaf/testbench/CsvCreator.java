@@ -10,6 +10,7 @@ public class CsvCreator implements DataCollector{
     private File file;
 
     private int generation_counter;
+    private boolean done = false;
 
     private final int max_generations;
     public CsvCreator(String csvFileName, int max_generations) {
@@ -25,7 +26,10 @@ public class CsvCreator implements DataCollector{
     @Override
     public void saveFitnessOfIndividual(float fitness_value) {
         if (generation_counter < max_generations){
-            writeToCsv(String.format("%2.6f\t", fitness_value));
+            writeToCsv(String.format("%.6f\t", fitness_value));
+        } else if (!done){
+            System.out.println("Csv file created\n");
+            done = true;
         }
     }
 

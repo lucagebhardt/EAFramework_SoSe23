@@ -61,10 +61,10 @@ public class TestDEAlgo {
                             exp(0.5 * (cos(2 * PI * x0) + cos(2 * PI * x1))) + exp(1) + 20);
                 };
 
-        var comparator = new MinimizeFunctionComparator(evalSphereFunc2D);
+        var comparator = new MinimizeFunctionComparator(evalAckley);
 
         var algo = new DEAlgorithm(min, max,
-                comparator, new ComparatorIndividual(0.001f), new RandomMutation(min, max),new Random(),0.4f, 0.1f, 10, new CsvCreator("DE_with_sphere", 10000));
+                comparator, 0.001f, new RandomMutation(min, max),new Random(),0.4f, 0.1f, 10, new CsvCreator("DE_with_ackley", 10000));
         algo.run();
     }
 }

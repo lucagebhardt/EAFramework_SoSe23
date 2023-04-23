@@ -14,12 +14,12 @@ public class DEAlgorithm extends Algorithm<Individual>{
     private final float c;
     private final int N;
     private final IndividualFactory<Individual> indFac;
-    private final ComparatorIndividual terminationCriterion;
+    private final float terminationCriterion;
     private final DataCollector dataCollector;
 
     private final int dimensions;
 
-    public DEAlgorithm(float[] min, float[] max, Comparator<Individual> comparator, ComparatorIndividual terminationCriterion, Mutation mutator, Random rng, final float F, final float c, final int N, DataCollector dataCollector) {
+    public DEAlgorithm(float[] min, float[] max, Comparator<Individual> comparator, float terminationCriterion, Mutation mutator, Random rng, final float F, final float c, final int N, DataCollector dataCollector) {
         super(comparator, mutator, rng);
         this.terminationCriterion = terminationCriterion;
         this.indFac = new GenericIndividualFactory(min, max);
@@ -33,10 +33,10 @@ public class DEAlgorithm extends Algorithm<Individual>{
     @Override
     protected boolean isTerminationCondition() {
         population.sort(comparator);
-        for (int i = 0; i < population.size(); i++) {
-            dataCollector.saveFitnessOfIndividual(population.get(i).getCache());
+        for (int i = 0; i < population.get(0).getGenome().len(); i++) {
+            dataCollector.saveFitnessOfIndividual(population.get(0).getGenome().array()[i]);
         }
-        return comparator.compare(population.get(0), terminationCriterion) > 0;
+        return  population.get(0).getCache() < terminationCriterion;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class DEAlgorithm extends Algorithm<Individual>{
             }
         }
         for (int i = 0; i < population.size(); i++) {
-            if (comparator.compare(new GenericIndividual(u[i]), population.get(i)) < 0) {
+            if (comparator.compare(new GenericIndividual(u[i]), population.get(i)) > 0) {
                 population.set(i, new GenericIndividual(u[i]));
             }
         }

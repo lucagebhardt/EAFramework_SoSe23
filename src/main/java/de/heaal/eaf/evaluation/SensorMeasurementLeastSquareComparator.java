@@ -45,16 +45,36 @@ public class SensorMeasurementLeastSquareComparator<T extends Individual> implem
     public int compare(T o1, T o2) {
         float individualOneSumOfFailure = 0;
         float individualTwoSumOfFailure = 0;
-        for (int i = 0; i < csvEntries.size(); i++) {
-            float currentCsvEntry = Float.parseFloat(csvEntries.get(CSV_COLUMN_OF_SENSOR_VALUES).get(i));
-            individualOneSumOfFailure += Math.pow(currentCsvEntry - fitnessFunction.apply(o1, (float) i), 2);
-            individualTwoSumOfFailure += Math.pow(currentCsvEntry - fitnessFunction.apply(o2, (float) i), 2);
+        for (int i = 1; i < 1000; i++) {
+            try{
+                float currentCsvEntry = Float.parseFloat(csvEntries.get(i).get(CSV_COLUMN_OF_SENSOR_VALUES));
+                individualOneSumOfFailure += Math.pow(currentCsvEntry - fitnessFunction.apply(o1, (float) i), 2);
+                individualTwoSumOfFailure += Math.pow(currentCsvEntry - fitnessFunction.apply(o2, (float) i), 2);
+            } catch (NumberFormatException e) {
+                System.out.println("An error occured");
+            }
         }
-        return Float.compare(individualTwoSumOfFailure, individualOneSumOfFailure);
+        o1.setCache(individualOneSumOfFailure);
+        o2.setCache(individualTwoSumOfFailure);
+        return Float.compare(individualOneSumOfFailure, individualTwoSumOfFailure);
     }
 
     @Override
     public Comparator<T> reversed() {
         return Comparator.super.reversed();
+    }
+
+    public void evaluateFitness(Individual individual) {
+        float individualSumOfFailure = 0;
+        for (int i = 1; i < csvEntries.size(); i++) {
+            try{
+
+                float currentCsvEntry = Float.parseFloat(csvEntries.get(i).get(CSV_COLUMN_OF_SENSOR_VALUES));
+                individualSumOfFailure += Math.pow(currentCsvEntry - fitnessFunction.apply(individual, (float) i), 2);
+            } catch (NumberFormatException e) {
+                System.out.println("An error occured");
+            }
+        }
+        individual.setCache(individualSumOfFailure);
     }
 }
