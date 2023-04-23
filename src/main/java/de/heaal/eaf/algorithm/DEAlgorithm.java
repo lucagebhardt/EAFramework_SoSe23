@@ -55,6 +55,7 @@ public class DEAlgorithm extends Algorithm<Individual>{
             int jR = new Random().nextInt(0,n);
             for (int j = 0; j < n; j++) {
                 float rcj = new Random().nextFloat(0,1);
+                //TODO Strategy Pattern anwenden und auslagern!
                 if ((rcj < c) || (j == jR)) {
                     u[i].array()[j] = vI.getGenome().array()[j];
                 } else {
