@@ -8,6 +8,7 @@ import de.heaal.eaf.testbench.DataCollector;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
+import java.util.stream.Stream;
 
 public class DEAlgorithm extends Algorithm<Individual>{
     private final float F;
@@ -19,7 +20,8 @@ public class DEAlgorithm extends Algorithm<Individual>{
 
     private final int dimensions;
 
-    public DEAlgorithm(float[] min, float[] max, Comparator<Individual> comparator, float terminationCriterion, Mutation mutator, Random rng, final float F, final float c, final int N, DataCollector dataCollector) {
+    public DEAlgorithm(float[] min, float[] max, Comparator<Individual> comparator, float terminationCriterion,
+                       Mutation mutator, Random rng, final float F, final float c, final int N, DataCollector dataCollector) {
         super(comparator, mutator, rng);
         this.terminationCriterion = terminationCriterion;
         this.indFac = new GenericIndividualFactory(min, max);
@@ -50,12 +52,11 @@ public class DEAlgorithm extends Algorithm<Individual>{
             int r1 = getRandomIntegerWithNumbersToAvoid(new int[]{i}, 0,N);
             int r2 = getRandomIntegerWithNumbersToAvoid(new int[]{i, r1}, 0, N);
             int r3 = getRandomIntegerWithNumbersToAvoid(new int[]{i, r1, r2}, 0, N);
-            Individual vI = population.get(r1).add(population.get(r2).sub(population.get(r3)).mul(F));
+            Individual vI = population.get(r1).copy().add(population.get(r2).copy().sub(population.get(r3).copy()).mul(F));
             int n = population.get(0).getGenome().len();
             int jR = new Random().nextInt(0,n);
             for (int j = 0; j < n; j++) {
                 float rcj = new Random().nextFloat(0,1);
-                //TODO Strategy Pattern anwenden und auslagern!
                 if ((rcj < c) || (j == jR)) {
                     u[i].array()[j] = vI.getGenome().array()[j];
                 } else {
@@ -64,7 +65,7 @@ public class DEAlgorithm extends Algorithm<Individual>{
             }
         }
         for (int i = 0; i < population.size(); i++) {
-            if (comparator.compare(new GenericIndividual(u[i]), population.get(i)) > 0) {
+            if (comparator.compare(new GenericIndividual(u[i]), population.get(i)) < 0) {
                 population.set(i, new GenericIndividual(u[i]));
             }
         }
@@ -73,7 +74,6 @@ public class DEAlgorithm extends Algorithm<Individual>{
     private int getRandomIntegerWithNumbersToAvoid(int[] avoid, int lowerBound, int upperBound) {
         Random rand = new Random();
         int randomNum;
-
         do {
             randomNum = rand.nextInt(lowerBound,upperBound);
         } while (Arrays.binarySearch(avoid,randomNum)>=0);

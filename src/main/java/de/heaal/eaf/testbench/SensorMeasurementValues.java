@@ -15,8 +15,6 @@ import java.util.function.Function;
 
 public class SensorMeasurementValues {
     public static void main(String[] args) throws FileNotFoundException {
-//        float[] min = {Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
-//        float[] max = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
         float[] min = {-1000, -1000, -1000, -1000};
         float[] max = {1000, 1000, 1000, 1000};
         BiFunction<Individual,Float,Float> fitnessFunction = (individual, t) -> {
@@ -27,8 +25,12 @@ public class SensorMeasurementValues {
             return (float) (A*Math.sin(2*Math.PI*f*t+phi)+D);
         };
         var comparator = new SensorMeasurementLeastSquareComparator("resources/generic_sinus.csv", fitnessFunction);
+        float F = 0.4f;
+        float c = 0.1f;
+        int N = 10;
+        int maxGenerations = 10000;
         var algo = new DEAlgorithm(min, max,
-                comparator, 10.f, new RandomMutation(min, max),new Random(),0.4f, 0.1f, 10, new CsvCreator("DE_with_csv", 10000));
+                comparator, 1.f, new RandomMutation(min, max),new Random(), F, c, N, new CsvCreator("DE_with_csv", maxGenerations));
         algo.run();
 
     }

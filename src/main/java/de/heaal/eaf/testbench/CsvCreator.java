@@ -26,7 +26,7 @@ public class CsvCreator implements DataCollector{
     @Override
     public void saveFitnessOfIndividual(float fitness_value) {
         if (generation_counter < max_generations){
-            writeToCsv(String.format("%.6f\t", fitness_value));
+            writeToCsv(String.format("%.6f", fitness_value).replace(",",".") +",");
         } else if (!done){
             System.out.println("Csv file created\n");
             done = true;
