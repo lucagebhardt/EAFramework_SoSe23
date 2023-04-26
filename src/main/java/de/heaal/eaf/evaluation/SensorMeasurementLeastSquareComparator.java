@@ -14,8 +14,8 @@ import java.util.function.BiFunction;
 public class SensorMeasurementLeastSquareComparator<T extends Individual> implements Comparator<T> {
     private final List<List<String>> csvEntries;
     private final BiFunction<Individual, Float, Float> fitnessFunction;
-    private final static int CSV_COLUMN_OF_SENSOR_VALUES = 0;
-    private final static int NUMBER_OF_DATA_POINTS = 500;
+    private final static int CSV_COLUMN_OF_SENSOR_VALUES = 4;
+    private final static int NUMBER_OF_DATA_POINTS = 1000;
     private final static int FIRST_DATA_POINT_TO_BE_READ = 1;
 
     public SensorMeasurementLeastSquareComparator(String filename, BiFunction<Individual, Float, Float> fitnessFunction) throws FileNotFoundException {
@@ -24,7 +24,7 @@ public class SensorMeasurementLeastSquareComparator<T extends Individual> implem
         try (BufferedReader csvReader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = csvReader.readLine()) != null) {
-                List<String> values = List.of(line.split(","));
+                List<String> values = List.of(line.split(";"));
                 csvEntries.add(values);
             }
         } catch (IOException e) {
@@ -44,7 +44,7 @@ public class SensorMeasurementLeastSquareComparator<T extends Individual> implem
         float individualTwoSumOfFailure = 0;
         for (int i = FIRST_DATA_POINT_TO_BE_READ; i < NUMBER_OF_DATA_POINTS; i++) {
             try{
-                float currentCsvEntry = Float.parseFloat(csvEntries.get(i).get(CSV_COLUMN_OF_SENSOR_VALUES));
+                float currentCsvEntry = Float.parseFloat(csvEntries.get(i).get(CSV_COLUMN_OF_SENSOR_VALUES).replace(",", "."));
                 individualOneSumOfFailure += Math.pow(currentCsvEntry - fitnessFunction.apply(o1, (float) i), 2);
                 individualTwoSumOfFailure += Math.pow(currentCsvEntry - fitnessFunction.apply(o2, (float) i), 2);
             } catch (NumberFormatException e) {

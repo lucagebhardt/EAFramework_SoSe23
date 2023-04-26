@@ -24,13 +24,13 @@ public class SensorMeasurementValues {
             float D = individual.getGenome().array()[3];
             return (float) (A*Math.sin(2*Math.PI*f*t+phi)+D);
         };
-        var comparator = new SensorMeasurementLeastSquareComparator("resources/generic_sinus.csv", fitnessFunction);
-        float F = 0.4f;
-        float c = 0.1f;
-        int N = 10;
-        int maxGenerations = 10000;
+        var comparator = new SensorMeasurementLeastSquareComparator("resources/sensordata.csv", fitnessFunction);
+        float F = 0.45f;
+        float c = 0.5f;
+        int N = 100;
+        int maxGenerations = 1000;
         var algo = new DEAlgorithm(min, max,
-                comparator, 1.f, new RandomMutation(min, max),new Random(), F, c, N, new CsvCreator("DE_with_csv", maxGenerations));
+                comparator, 1.f, new RandomMutation(min, max),new Random(), F, c, N, new CsvCreator("sensordata_DE_F=0_45-c=0_5-N=100_data=500_maxGen=10000_with_csv", maxGenerations));
         algo.run();
 
     }

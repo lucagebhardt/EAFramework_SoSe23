@@ -62,9 +62,12 @@ public class TestDEAlgo {
                 };
 
         var comparator = new MinimizeFunctionComparator(evalAckley);
+        float F = 0.45f;
+        float c = 0.5f;
+        int N = 100;
 
         var algo = new DEAlgorithm(min, max,
-                comparator, 0.001f, new RandomMutation(min, max),new Random(),0.4f, 0.1f, 10, new CsvCreator("DE_with_ackley", 10000));
+                comparator, 0.001f, new RandomMutation(min, max),new Random(),F, c, N, new CsvCreator("DE_with_ackley", 10000));
         algo.run();
     }
 }
