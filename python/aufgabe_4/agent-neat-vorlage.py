@@ -5,7 +5,7 @@ import math
 import visualize
 
 # Kantenlänge des Labyrinths
-MAP_SIZE = 25
+MAP_SIZE = 7
 
 
 class MapGenerator:
@@ -150,8 +150,30 @@ class Agent:
             return x >= 0 and x < len(self.map) and y >= 0 and y < len(self.map[0]) and self.map[x][y] != 1 and (x,y) not in self.visited and self.map[x][y] == 0
         
         # TODO
-
-        return False
+        # 0=up, 1=right, 2=down, 3=left
+        success = False
+        match direction:
+            case 0:
+                new_y = self.pos_y-1
+                if valid_move(self.pos_x,new_y):
+                    self.pos_y = new_y
+                    success = True
+            case 1:
+                new_x = self.pos_x+1
+                if valid_move(new_x, self.pos_y):
+                    self.pos_x = new_x
+                    success = True
+            case 2:
+                new_y = self.pos_y+1
+                if valid_move(self.pos_x,new_y):
+                    self.pos_y = new_y
+                    success = True
+            case 3:
+                new_x = self.pos_x-1
+                if valid_move(new_x, self.pos_y):
+                    self.pos_x = new_x
+                    success = True
+        return success
 
     def _get_distance(self):
         return math.sqrt((self.goal_x - self.pos_x)**2 + (self.goal_y - self.pos_y)**2)
@@ -183,9 +205,19 @@ class Agent:
         """
         
         # TODO
+        for i in range(100):
+            inputs = self._get_map_env()
+            output = self.activate_net(inputs)
+            self.move(output)
 
-        return 
+            if self.pos_x == 0 and self.pos_y == 0:
+                self.fitness = 1
+                return
+        self.fitness = self.euclidian_distance(self.pos_x,self.pos_y,MAP_SIZE,MAP_SIZE)/self.euclidian_distance(MAP_SIZE,MAP_SIZE)
+        return
 
+    def euclidian_distance(self,x1,y1,x2=0,y2=0):
+        return math.sqrt((x2-x1) ** 2 + (y2-y1) ** 2)
 
 # Creates agents with the given net and tests it on the given map
 def eval_genomes(genomes, config):
@@ -214,7 +246,8 @@ config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                      neat.DefaultSpeciesSet, neat.DefaultStagnation,
                      'neat-config')
 config.map = generator.map
-
+#config.fitness_criterion = neat.config.Minimize
+config.fitness_criterion = "min"
 # Erzeugen einer Population
 p = neat.Population(config)
 
