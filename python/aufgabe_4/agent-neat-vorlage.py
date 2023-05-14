@@ -5,7 +5,7 @@ import math
 import visualize
 
 # Kantenlänge des Labyrinths
-MAP_SIZE = 7
+MAP_SIZE = 10
 
 
 class MapGenerator:
@@ -211,7 +211,7 @@ class Agent:
             self.move(output)
 
             if self.pos_x == 0 and self.pos_y == 0:
-                self.fitness = 1
+                self.fitness = 1.0
                 return
         self.fitness = self.euclidian_distance(self.pos_x,self.pos_y,MAP_SIZE,MAP_SIZE)/self.euclidian_distance(MAP_SIZE,MAP_SIZE)
         return
@@ -247,7 +247,6 @@ config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                      'neat-config')
 config.map = generator.map
 #config.fitness_criterion = neat.config.Minimize
-config.fitness_criterion = "min"
 # Erzeugen einer Population
 p = neat.Population(config)
 
