@@ -5,7 +5,9 @@ import math
 import visualize
 
 # Kantenlänge des Labyrinths
-MAP_SIZE = 10
+MAP_SIZE = 25
+STEPS = 100
+GENERATIONS = 100
 
 
 class MapGenerator:
@@ -122,6 +124,7 @@ class Agent:
         self.map = None
         self.visited = set()
         self.fitness = 0.0
+        self.moves_history = list()
 
     def set_map(self, map):
         self.map = map
@@ -147,9 +150,8 @@ class Agent:
         """
         
         def valid_move(x, y):
-            return x >= 0 and x < len(self.map) and y >= 0 and y < len(self.map[0]) and self.map[x][y] != 1 and (x,y) not in self.visited and self.map[x][y] == 0
+            return x >= 0 and x < len(self.map) and 0 <= y and y < len(self.map[0]) and self.map[x][y] != 1 and (x, y) not in self.visited and (self.map[x][y] == 0 or self.map[x][y] == 'S')
         
-        # TODO
         # 0=up, 1=right, 2=down, 3=left
         success = False
         match direction:
@@ -158,21 +160,35 @@ class Agent:
                 if valid_move(self.pos_x,new_y):
                     self.pos_y = new_y
                     success = True
+                    self.moves_history.append(True)
+                else:
+                    self.moves_history.append(False)
             case 1:
                 new_x = self.pos_x+1
                 if valid_move(new_x, self.pos_y):
                     self.pos_x = new_x
                     success = True
+                    self.moves_history.append(True)
+                else:
+                    self.moves_history.append(False)
             case 2:
                 new_y = self.pos_y+1
                 if valid_move(self.pos_x,new_y):
                     self.pos_y = new_y
                     success = True
+                    self.moves_history.append(True)
+                else:
+                    self.moves_history.append(False)
+
             case 3:
                 new_x = self.pos_x-1
                 if valid_move(new_x, self.pos_y):
                     self.pos_x = new_x
                     success = True
+                    self.moves_history.append(True)
+                else:
+                    self.moves_history.append(False)
+            case _: self.moves_history.append(False)
         return success
 
     def _get_distance(self):
@@ -205,7 +221,7 @@ class Agent:
         """
         
         # TODO
-        for i in range(100):
+        for i in range(STEPS):
             inputs = self._get_map_env()
             output = self.activate_net(inputs)
             self.move(output)
@@ -213,8 +229,17 @@ class Agent:
             if self.pos_x == 0 and self.pos_y == 0:
                 self.fitness = 1.0
                 return
-        self.fitness = self.euclidian_distance(self.pos_x,self.pos_y,MAP_SIZE,MAP_SIZE)/self.euclidian_distance(MAP_SIZE,MAP_SIZE)
+        self.fitness = self.euclidean_distance_norm()
         return
+    def euclidean_distance_norm(self):
+        return self.euclidian_distance(self.pos_x, self.pos_y, MAP_SIZE, MAP_SIZE) / self.euclidian_distance(MAP_SIZE,MAP_SIZE)
+
+    def norm_number_of_valid_moves(self):
+        value = float(self.moves_history.count(True)) / float(STEPS)
+        if value == 1.0:
+            value = 0.99
+        return value
+
 
     def euclidian_distance(self,x1,y1,x2=0,y2=0):
         return math.sqrt((x2-x1) ** 2 + (y2-y1) ** 2)
@@ -258,12 +283,12 @@ stats = neat.StatisticsReporter()
 p.add_reporter(stats)
 
 # Run until a solution is found.
-winner = p.run(eval_genomes, 100) # up to X generations
+winner = p.run(eval_genomes, GENERATIONS) # up to X generations
 
-#visualize.draw_net(config, winner, True)
-#visualize.draw_net(config, winner, True, prune_unused=True)
-#visualize.plot_stats(stats, ylog=False, view=True)
-#visualize.plot_species(stats, view=True)
+visualize.draw_net(config, winner, True)
+visualize.draw_net(config, winner, True, prune_unused=False)
+visualize.plot_stats(stats, ylog=False, view=True)
+visualize.plot_species(stats, view=True)
 
 net = neat.nn.FeedForwardNetwork.create(winner, config)
 agent = Agent(net)
