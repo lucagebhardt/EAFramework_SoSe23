@@ -1,6 +1,13 @@
 package de.florian_luca;
 
-public class Train {
+import io.jenetics.EnumGene;
+import io.jenetics.engine.Codec;
+import io.jenetics.engine.Problem;
+import io.jenetics.util.ISeq;
+
+import java.util.function.Function;
+
+public class Train implements Problem<ISeq<Integer>, EnumGene<Integer>, Double> {
     private final int vmax;
     private int velocity;
     private int distance;
@@ -34,6 +41,22 @@ public class Train {
         distance -= velocity;
         energy += Math.pow(velocity,2);
         time++;
-        return 0.0;
+        return 0;
+    }
+
+
+    @Override
+    public Function<ISeq<Integer>, Double> fitness() {
+        return genomes -> {
+            double scalingTime = 1.0;
+            double scalingDistance = 1.0;
+            double scalingEnergy = 1.0;
+            return scalingDistance*distance + scalingEnergy*energy + scalingTime*time;
+        };
+    }
+
+    @Override
+    public Codec<ISeq<Integer>, EnumGene<Integer>> codec() {
+        return null;
     }
 }
