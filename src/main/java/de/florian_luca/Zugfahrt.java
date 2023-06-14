@@ -61,21 +61,24 @@ public class Zugfahrt {
                 break;
             }
         }
-        // time
-        // speed
+
         distanceOfBestTrain = zug.getEntfernung()-INITIAL_DISTANCE;
         if(distanceOfBestTrain<0) {
             // Individuen, die nicht ankommen, werden bestraft
             return Integer.MAX_VALUE;
         }
-        return  3*distanceOfBestTrain + 2*zug.getEnergie() + 2*zug.getTickCounter() + ind.geneCount();
+        //
+        int highestPriority = 3;
+        int mediumPriority = 2;
+        int lowestPriority = 1;
+        return  highestPriority*distanceOfBestTrain + mediumPriority*zug.getEnergie() + mediumPriority*zug.getTickCounter() + lowestPriority*ind.geneCount();
     }
     
     public static void main(String[] args) {
         final ISeq<Op<Double>> operations = ISeq.of(
                 new Zug.SetSpeed(), 
                 new Zug.IfElse(),
-                MathOp.ADD, MathOp.SUB, MathOp.MUL);
+                MathOp.ADD, MathOp.SUB, MathOp.MUL); // Hier haben wir noch das MUL hinzugefügt
         
         final ISeq<Op<Double>> terminals = ISeq.of(
                 new Zug.GetSpeed(), 
@@ -97,25 +100,11 @@ public class Zugfahrt {
                 .populationSize(POPULATION)
                 .build();
 
-//        final EvolutionResult<ProgramGene<Double>, Double> result = engine
-//            .stream()
-//            .limit(Limits.byFixedGeneration(10))
-//            .collect(EvolutionResult.toBestEvolutionResult());
-//
-//
-//
-//        System.out.println("Generations: " + result.totalGenerations());
-//        System.out.println("Function:    " + tree);
-//        System.out.println("Error:       " + error(result.bestPhenotype().genotype()));
-
-        ///////////////////////////////////////////////////
         final var results = engine
                 .stream()
                 .limit(Limits.byFixedGeneration(GENERATIONS)).collect(Collectors.toList());
 
         EvolutionResult result = results.get(GENERATIONS-1); // last generation
-       // final TreeNode<Op<Double>> last = result.bestPhenotype()
-      //          .genotype().gene().toTreeNode();
         List<Genotype<ProgramGene<Double>>> pop = new ArrayList<>(result.genotypes().asList());
         pop.sort((a, b) -> {
             double e1 = error(a);
@@ -128,12 +117,9 @@ public class Zugfahrt {
                 return 0;
             }
         });
-        //List<Double> popError = pop.stream().map(p -> error(p)).collect(Collectors.toList());
 
-        //
         Genotype<ProgramGene<Double>> best = result.bestPhenotype().genotype();
 
-        // tree anders printen (evtl svg)
         final TreeNode<Op<Double>> tree = pop.get(0).gene().toTreeNode();
         System.out.println("Generations: " + result.totalGenerations());
         System.out.println("Function:    " + tree);
@@ -142,7 +128,6 @@ public class Zugfahrt {
         for (int i = 0; i < tree.depth()+1; i++){
             treeString.add(i, new ArrayList<>());
         }
-        //createTreeString(tree, 0, treeString);
         System.out.println("Entfernung zum Ziel:  " + distanceOfBestTrain);
         printBestTrain(INITIAL_DISTANCE-distanceOfBestTrain, INITIAL_DISTANCE);
 
@@ -150,8 +135,6 @@ public class Zugfahrt {
 
     public static void createTreeString(TreeNode<Op<Double>> tree, int idx, List<List<String>> treeString){
         treeString.get(idx).add(tree.value().toString());
-//        int depth = tree.depth();
-//        int child_depth = tree.firstChild().isPresent() ? tree.firstChild().get().depth() : 0;
         Iterator<TreeNode<Op<Double>>> iter = tree.childIterator();
         idx++;
         while(iter.hasNext()){
